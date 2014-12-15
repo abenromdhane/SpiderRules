@@ -30,7 +30,7 @@ THE SOFTWARE.
 #include <string>
 #include "headers/jsRetriever.h"
 #include "headers/utils.h"
-#include "headers/RulesDependencies.h"
+#include "headers/RulesSet.h"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -92,12 +92,12 @@ int main(int argc, const char *argv[])
 
 
 
-	std::vector<Rule*> ruleSet;
-	ruleSet.push_back(&r00);
-	ruleSet.push_back(&r01);
-	ruleSet.push_back(&r02);
-	RulesDependencies ruleDep(&global_class);
-	ruleDep.createGraphDependency(ruleSet);
+
+	RulesSet ruleDep(&global_class);
+	ruleDep.addRule(&r00);
+	ruleDep.addRule(&r01);
+	ruleDep.addRule(&r02);
+	ruleDep.createGraphDependency();
 	
 
 
@@ -105,16 +105,15 @@ int main(int argc, const char *argv[])
 	std::cout << "\n-- graphviz output START --" << std::endl;
 	boost::write_graphviz(std::cout, ruleDep.customGraph);
 	std::cout << "\n-- graphviz output END --" << std::endl;
-	JsRetriever * jsre = new JsRetriever(rt, &global_class);
+	//JsRetriever * jsre = new JsRetriever(rt, &global_class);
 	/*std::wstring json = get_file_contents("R0.rule");
 	jsre->parseJSON(json);*/
-	jsre->init();
-	ruleDep.executeRuleSet(jsre);
+	ruleDep.executeRulesSet();
 
    
 
 
-	delete jsre;
+	//delete jsre;
 
 	
 

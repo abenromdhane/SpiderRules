@@ -84,7 +84,7 @@
     <ClInclude Include="headers\fact.h" />
     <ClInclude Include="headers\jsRetriever.h" />
     <ClInclude Include="headers\rule.h" />
-    <ClInclude Include="headers\rulesDependencies.h" />
+    <ClInclude Include="headers\RulesSet.h" />
     <ClInclude Include="headers\utils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

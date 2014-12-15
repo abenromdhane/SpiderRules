@@ -49,14 +49,17 @@ public:
   JsRetriever* jsRetriever;
 };
 
-class RulesDependencies
+class RulesSet
 {
 private :
 	JsRetriever* esprimaRetriever;
 	JSRuntime *rt;
-	void parseTokenizeObject(std::vector<Rule*> ruleSet, unsigned int ruleIndex, JS::MutableHandleValue rootVal)
+	JsRetriever* rulesExecutioner;
+	std::vector<Rule*> rulesVector;
+
+	void parseTokenizeObject(unsigned int ruleIndex, JS::MutableHandleValue rootVal)
 	{
-		Rule* rule = ruleSet[ruleIndex];
+		Rule* rule = rulesVector[ruleIndex];
 		if (rootVal.isObject())
 		{
 			JSObject * jsobj = &rootVal.toObject();
@@ -84,7 +87,7 @@ private :
 								if (typeString == "Identifier")
 								{
 									int i = 0;
-									BOOST_FOREACH(Rule* currentRule, ruleSet)
+									BOOST_FOREACH(Rule* currentRule, rulesVector)
 									{										
 										if(currentRule->getName() == nameString)
 										{
@@ -110,22 +113,19 @@ public :
 
 	CustomGraph customGraph;
 	std::vector<CustomVertex> vertices;
-	RulesDependencies(JSClass * classp)
+	RulesSet(JSClass * classp)
 	{
 		rt = JS_NewRuntime(8L * 1024 * 1024, JS_NO_HELPER_THREADS);
 		esprimaRetriever = new JsRetriever(rt, classp);
 		esprimaRetriever->init();
+		rulesExecutioner = new JsRetriever(rt, classp);
+		rulesExecutioner->init();
 	}
 
-	~RulesDependencies()
+
+	void createRuleDependencies(unsigned int ruleIndex)
 	{
-		delete esprimaRetriever;
-		JS_DestroyRuntime(rt);
-		JS_ShutDown();
-	}
-	void createRuleDependencies(std::vector<Rule*> ruleSet, unsigned int ruleIndex)
-	{
-		Rule* rule = ruleSet[ruleIndex];
+		Rule* rule = rulesVector[ruleIndex];
 		int lineno = 0;
 		JS::Value rval;
 		std::ifstream t("esprima.js");
@@ -137,33 +137,43 @@ public :
 			rval = esprimaRetriever->evaluateScript(str, "");
 			
 			JS::RootedValue rootVal(esprimaRetriever->getContext(),rval);
-			parseTokenizeObject(ruleSet, ruleIndex, &rootVal);
+			parseTokenizeObject(ruleIndex, &rootVal);
 		}
 		{
 			str = "esprima.tokenize(\""+rule->getAction() +"\")";
 			rval = esprimaRetriever->evaluateScript(str, "");
 			
 			JS::RootedValue rootVal(esprimaRetriever->getContext(),rval);
-			parseTokenizeObject(ruleSet, ruleIndex, &rootVal);
+			parseTokenizeObject(ruleIndex, &rootVal);
 		}
 	}
 
-	void createGraphDependency(std::vector<Rule*> ruleSet)
+	void addRule(Rule* rule)
 	{
-		BOOST_FOREACH(Rule* ruleToAddToGraph, ruleSet)
+		rulesVector.push_back(rule);
+		vertices.push_back(boost::add_vertex(rule, customGraph));
+	}
+
+	void createGraphDependency()
+	{
+		for(int index = 0; index<rulesVector.size();index++)
 		{
-			vertices.push_back(boost::add_vertex(ruleToAddToGraph, customGraph));
-		}
-		for(int index = 0; index<ruleSet.size();index++)
-		{
-			createRuleDependencies(ruleSet,index);
+			createRuleDependencies(index);
 		}
 	}
 
-	void executeRuleSet(JsRetriever* jsRetriever)
+	void executeRulesSet()
 	{
 		MyVisitor vis;
-		vis.jsRetriever = jsRetriever;
+		vis.jsRetriever = rulesExecutioner;
 		boost::depth_first_search(customGraph, boost::visitor(vis));
+	}
+
+		~RulesSet()
+	{
+		delete esprimaRetriever;
+		delete rulesExecutioner;
+		JS_DestroyRuntime(rt);
+		JS_ShutDown();
 	}
 };

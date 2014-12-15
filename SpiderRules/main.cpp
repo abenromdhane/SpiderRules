@@ -28,10 +28,9 @@ THE SOFTWARE.
 #include <iostream>
 #include "jsapi.h"
 #include <string>
-#include "headers\jsRetriever.h"
-#include "headers\utils.h"
-#include "headers\RulesDependencies.h"
-#include <boost/lambda/lambda.hpp>
+#include "headers/jsRetriever.h"
+#include "headers/utils.h"
+#include "headers/RulesDependencies.h"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -50,6 +49,10 @@ static JSClass global_class = {
     JS_ConvertStub
 };
 
+
+
+
+
 int main(int argc, const char *argv[])
 {
 
@@ -57,11 +60,7 @@ int main(int argc, const char *argv[])
     if (!rt)
         return 1;
 
-    JSContext *cx = JS_NewContext(rt, 8192);
-    if (!cx)
-        return 1;
-
-	
+    	
 	/*JS::RootedObject global(cx, JS_NewGlobalObject(cx, &global_class, nullptr));
     if (!global)
         return 1;
@@ -86,40 +85,42 @@ int main(int argc, const char *argv[])
 	  JS::RootedValue val(cx);
 	  JS_ParseJSON(cx, json.c_str(), json.length(), &val);*/
 
-		Rule r00("r00","input.foo > 15 ", "100");
-		Rule r01("r01","r00 + 65 > 200 ", "100");
-		Rule r02("r02","input.bar > (r00 + r01)", "100");
-		
+	Rule r00("r00","200 > 15 ", "r00 = 100");
+	Rule r01("r01","r00 + 65 > 200 ", "r01 = 100");
+	Rule r02("r02","132 > (r00 + r01)", "r02 = 100");
+	
 
 
 
-		std::vector<Rule> ruleSet;
-		ruleSet.push_back(r00);
-		ruleSet.push_back(r01);
-		ruleSet.push_back(r02);
-		RulesDependencies ruleDep(&global_class);
-		ruleDep.createGraphDependency(ruleSet);
-		// write graph to console
-		std::cout << "\n-- graphviz output START --" << std::endl;
-		boost::write_graphviz(std::cout, ruleDep.customGraph);
-		std::cout << "\n-- graphviz output END --" << std::endl;
-		JsRetriever * jsre = new JsRetriever(cx, &global_class);
-	  /*std::wstring json = get_file_contents("R0.rule");
-	  jsre->parseJSON(json);*/
-		jsre->init();
+	std::vector<Rule*> ruleSet;
+	ruleSet.push_back(&r00);
+	ruleSet.push_back(&r01);
+	ruleSet.push_back(&r02);
+	RulesDependencies ruleDep(&global_class);
+	ruleDep.createGraphDependency(ruleSet);
+	
 
 
-		bool result = jsre->callConditionRule("2>1","r0");
+	// write graph to console
+	std::cout << "\n-- graphviz output START --" << std::endl;
+	boost::write_graphviz(std::cout, ruleDep.customGraph);
+	std::cout << "\n-- graphviz output END --" << std::endl;
+	JsRetriever * jsre = new JsRetriever(rt, &global_class);
+	/*std::wstring json = get_file_contents("R0.rule");
+	jsre->parseJSON(json);*/
+	jsre->init();
+	ruleDep.executeRuleSet(jsre);
+
    
 
 
-		delete jsre;
+	delete jsre;
 
 	
 
 
 
-    JS_DestroyContext(cx);
+
     JS_DestroyRuntime(rt);
     JS_ShutDown();
     return 0;

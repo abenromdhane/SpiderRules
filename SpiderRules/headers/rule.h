@@ -24,6 +24,7 @@ THE SOFTWARE.
 
 #pragma once
 #include<string>
+#include "jsRetriever.h"
 
 class Rule
 {
@@ -31,6 +32,7 @@ private :
 	std::string m_name;
 	std::string m_condition;
 	std::string m_action;
+	
 
 public :
 	Rule()
@@ -56,5 +58,10 @@ public :
 	std::string getAction()
 	{
 		return m_action;
+	}
+
+	const bool executeCondition(JsRetriever * jsRetriever)
+	{
+		return jsRetriever->EvaluateBooleanExpression(m_condition, m_name);
 	}
 };

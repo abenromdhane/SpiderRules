@@ -37,12 +37,11 @@ private :
 	JSAutoCompartment* ac;
 
 public:
-	JsRetriever(JSContext * jsContext, JSClass* classp )
+	JsRetriever(JSRuntime * runtime, JSClass* classp )
 	{
-		m_JSContext = jsContext;
+		m_JSContext = JS_NewContext(runtime, 8192);		
 		
-		
-		m_global = new JS::RootedObject(m_JSContext, JS_NewGlobalObject(m_JSContext, classp, nullptr));//;, JS_NewGlobalObject(cx, &global_class, nullptr));
+		m_global = new JS::RootedObject(m_JSContext, JS_NewGlobalObject(m_JSContext, classp, nullptr));
 		//JSAutoCompartment ac(m_JSContext, *m_global); 
 		//JS_InitStandardClasses(m_JSContext, *m_global);
 	}
@@ -125,27 +124,36 @@ public:
 		ac = new JSAutoCompartment(m_JSContext, *m_global);
 		JS_InitStandardClasses(m_JSContext, *m_global);		
 	}
-	bool callConditionRule(std::string condition, std::string ruleName)
+	bool EvaluateBooleanExpression(std::string expression, std::string ruleName)
 	{
 		int lineno = 0;
 		JS::Value rval;
-		/*std::ifstream t("esprima.js");
-		std::string str((std::istreambuf_iterator<char>(t)),
-                 std::istreambuf_iterator<char>());
-		bool ok0 = JS_EvaluateScript(m_JSContext, *m_global, str.c_str(), str.length(), ruleName.c_str(), lineno, &rval);
-		str = "esprima.tokenize(\"42>obj.foo\")";
-		ok0 = JS_EvaluateScript(m_JSContext, *m_global, str.c_str(), str.length(), ruleName.c_str(), lineno, &rval);
-		JS::RootedValue rootVal(m_JSContext,rval);
-		printJSObject(&rootVal);*/
-		bool ok = JS_EvaluateScript(m_JSContext, *m_global, condition.c_str(), condition.length(), ruleName.c_str(), lineno, &rval);
+		bool ok = JS_EvaluateScript(m_JSContext, *m_global, expression.c_str(), expression.length(), ruleName.c_str(), lineno, &rval);
 		if (ok && !rval.isNull() && rval.isBoolean())
 		{
 			return rval.toBoolean();
 		}
 	}
+
+	jsval evaluateScript(std::string script, std::string name)
+	{
+		int lineno = 0;
+		JS::Value rval;
+		JS_EvaluateScript(m_JSContext, *m_global, script.c_str(), script.length(), name.c_str(), lineno, &rval);
+		return rval;
+	}
+	
+
+	JSContext * getContext()
+	{
+		return m_JSContext;
+	}
+
+
 	~JsRetriever()
 	{
 		delete ac;
 		delete m_global;
+		JS_DestroyContext(m_JSContext);
 	}
 };

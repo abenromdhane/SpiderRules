@@ -45,7 +45,7 @@ public:
 	bool test = g.m_vertices[v].m_property->executeCondition(jsRetriever);
 	if (test)
 	{
-		g.m_vertices[v].m_property->executeCondition(jsRetriever);
+		g.m_vertices[v].m_property->executeAction(jsRetriever);
 	}
     std::cout << v << std::endl;
     return;

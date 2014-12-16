@@ -43,6 +43,10 @@ public:
   void discover_vertex(CustomVertex v, const CustomGraph& g) const
   {
 	bool test = g.m_vertices[v].m_property->executeCondition(jsRetriever);
+	if (test)
+	{
+		g.m_vertices[v].m_property->executeCondition(jsRetriever);
+	}
     std::cout << v << std::endl;
     return;
   }
@@ -152,6 +156,7 @@ public :
 	{
 		rulesVector.push_back(rule);
 		vertices.push_back(boost::add_vertex(rule, customGraph));
+		rulesExecutioner->defineDoubleValue(rule->getName(), 0.0);
 	}
 
 	void createGraphDependency()
@@ -175,5 +180,13 @@ public :
 		delete rulesExecutioner;
 		JS_DestroyRuntime(rt);
 		JS_ShutDown();
+	}
+
+	void printRulesResult()
+	{
+		BOOST_FOREACH(Rule * rule, rulesVector)
+		{
+			printf("%s = %f \n",rule->getName().c_str(), rulesExecutioner->getDoubleValue(rule->getName()));
+		}
 	}
 };

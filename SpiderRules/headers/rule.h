@@ -64,4 +64,9 @@ public :
 	{
 		return jsRetriever->EvaluateBooleanExpression(m_condition, m_name);
 	}
+
+	void executeAction(JsRetriever * jsRetriever)
+	{
+		jsRetriever->evaluateScript(m_action, m_name);
+	}
 };

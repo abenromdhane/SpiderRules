@@ -143,12 +143,25 @@ public:
 		return rval;
 	}
 	
+	void defineDoubleValue(std::string name, double defaultValue)
+	{
+		JS_DefineProperty(m_JSContext, *m_global, name.c_str(),JS_NumberValue(defaultValue),NULL,NULL,0);
+	}
+
+	double getDoubleValue(std::string valueName)
+	{
+		jsval *vp = new jsval();
+		JS_GetProperty(m_JSContext, *m_global, valueName.c_str(), vp);
+		if (vp->isNumber())
+		{
+			return vp->toNumber();
+		}
+	}
 
 	JSContext * getContext()
 	{
 		return m_JSContext;
 	}
-
 
 	~JsRetriever()
 	{

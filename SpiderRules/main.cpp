@@ -87,9 +87,8 @@ int main(int argc, const char *argv[])
 
 	Rule r00("r00","200 > 15 ", "r00 = 100");
 	Rule r01("r01","r00 + 65 > 200 ", "r01 = 100");
-	Rule r02("r02","132 > (r00 + r01)", "r02 = 100");
+	Rule r02("r02","54 > (r00 + r01)", "r02 = 100");
 	
-
 
 
 
@@ -110,7 +109,7 @@ int main(int argc, const char *argv[])
 	jsre->parseJSON(json);*/
 	ruleDep.executeRulesSet();
 
-   
+	ruleDep.printRulesResult();
 
 
 	//delete jsre;

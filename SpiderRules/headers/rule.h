@@ -32,41 +32,24 @@ private :
 	std::string m_name;
 	std::string m_condition;
 	std::string m_action;
+	double returnValue;
 	
 
 public :
-	Rule()
-	{
-	}
-	Rule(std::string name, std::string condition, std::string action)
-	{
-		m_name = name;
-		m_condition = condition;
-		m_action = action;
-	}
+	Rule();
 
-	std::string getName()
-	{
-		return m_name;
-	}
+	Rule(std::string name, std::string condition, std::string action);
 
-	std::string getCondition()
-	{
-		return m_condition;
-	}
+	std::string getName();
 
-	std::string getAction()
-	{
-		return m_action;
-	}
+	std::string getCondition();
 
-	const bool executeCondition(JsRetriever * jsRetriever)
-	{
-		return jsRetriever->EvaluateBooleanExpression(m_condition, m_name);
-	}
+	std::string getAction();
 
-	void executeAction(JsRetriever * jsRetriever)
-	{
-		jsRetriever->evaluateScript(m_action, m_name);
-	}
+	double getReturnValue();
+
+	const bool executeCondition(JsRetriever * jsRetriever);
+
+	void executeAction(JsRetriever * jsRetriever);
+
 };

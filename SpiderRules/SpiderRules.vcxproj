@@ -50,8 +50,8 @@
       <PrecompiledHeader>NotUsing</PrecompiledHeader>
       <WarningLevel>Level3</WarningLevel>
       <Optimization>Disabled</Optimization>
-      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
-      <AdditionalIncludeDirectories>..\boost\boost_1_57_0;..\Mozilla\jsapi\include;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>XP_WIN;WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <AdditionalIncludeDirectories>..\boost\boost_1_57_0;..\Mozilla\jsapi\include;headers;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
     </ClCompile>
     <Link>
       <SubSystem>Console</SubSystem>
@@ -78,12 +78,15 @@
   </ItemDefinitionGroup>
   <ItemGroup>
     <ClCompile Include="main.cpp" />
+    <ClCompile Include="src\JsRetriever.cpp" />
+    <ClCompile Include="src\Rule.cpp" />
+    <ClCompile Include="src\RulesSet.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\entity.h" />
     <ClInclude Include="headers\fact.h" />
     <ClInclude Include="headers\jsRetriever.h" />
-    <ClInclude Include="headers\rule.h" />
+    <ClInclude Include="headers\Rule.h" />
     <ClInclude Include="headers\RulesSet.h" />
     <ClInclude Include="headers\utils.h" />
   </ItemGroup>

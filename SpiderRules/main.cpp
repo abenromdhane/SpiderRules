@@ -22,15 +22,13 @@ OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
 THE SOFTWARE.
 */
 
-#ifdef _MSC_VER
-# define XP_WIN
-#endif
+
 #include <iostream>
 #include "jsapi.h"
 #include <string>
-#include "headers/jsRetriever.h"
-#include "headers/utils.h"
-#include "headers/RulesSet.h"
+#include "jsRetriever.h"
+#include "utils.h"
+#include "RulesSet.h"
 #include <iostream>
 #include <iterator>
 #include <algorithm>
@@ -80,22 +78,26 @@ int main(int argc, const char *argv[])
 	}*/
 
   
+	std::vector<std::vector<std::string>> csvData = parseRulesFromCSV("rules.spr");
+	
+	
 
-	  /*std::wstring json = StringToWString(std::string("{\"id\" : 1}"));
-	  JS::RootedValue val(cx);
-	  JS_ParseJSON(cx, json.c_str(), json.length(), &val);*/
-
-	Rule r00("r00","200 > 15 ", "r00 = 100");
-	Rule r01("r01","r00 + 65 > 200 ", "r01 = 100");
-	Rule r02("r02","54 > (r00 + r01)", "r02 = 100");
+	/*Rule r00("r00","input.id - 200 > 15 ", "100");
+	Rule r01("r01","r00 + 65 > 150 ", "input.id");
+	Rule r02("r02","54 > (r00 + r01)", "100");*/
 	
 
 
 
 	RulesSet ruleDep(&global_class);
-	ruleDep.addRule(&r00);
-	ruleDep.addRule(&r01);
-	ruleDep.addRule(&r02);
+	BOOST_FOREACH(std::vector<std::string>& line ,csvData)
+	{
+		ruleDep.addRule(new Rule(line[0], line[1], line[2]));	
+	}
+
+	//std::wstring json = L"{\"id\" : 421}";
+	std::wstring json = getInputJSONFile("input.json");
+	ruleDep.setInputObject(json);
 	ruleDep.createGraphDependency();
 	
 
@@ -107,8 +109,8 @@ int main(int argc, const char *argv[])
 	//JsRetriever * jsre = new JsRetriever(rt, &global_class);
 	/*std::wstring json = get_file_contents("R0.rule");
 	jsre->parseJSON(json);*/
-	ruleDep.executeRulesSet();
 
+	ruleDep.executeRulesSet();
 	ruleDep.printRulesResult();
 
 

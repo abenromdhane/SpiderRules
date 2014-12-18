@@ -37,136 +37,30 @@ private :
 	JSAutoCompartment* ac;
 
 public:
-	JsRetriever(JSRuntime * runtime, JSClass* classp )
-	{
-		m_JSContext = JS_NewContext(runtime, 8192);		
-		
-		m_global = new JS::RootedObject(m_JSContext, JS_NewGlobalObject(m_JSContext, classp, nullptr));
-		//JSAutoCompartment ac(m_JSContext, *m_global); 
-		//JS_InitStandardClasses(m_JSContext, *m_global);
-	}
 
-	JsRetriever()
-	{
-		m_JSContext = NULL;	
-	}
+	JsRetriever(JSRuntime * runtime, JSClass* classp );
 
+	JsRetriever();
 
-	void printJSObject(JS::MutableHandleValue vp)
-	{
-		if (vp.isObject())
-		{
-			JSObject * jsobj = &vp.toObject();
-			JS::AutoIdArray ida(m_JSContext , JS_Enumerate(m_JSContext, jsobj));
-			int count = ida.length();
-			for (uint32_t i = 0 ; i<count; i++)
-			{
-				JS::Value element;
-				JS_IdToValue(m_JSContext,ida[i], &element);
-				if (element.isString())
-				{
-					std::string elementName = JS_EncodeStringToUTF8(m_JSContext,element.toString());
-					printf("%s : ", elementName.c_str());
-					jsval vpElement;
-					if (JS_GetPropertyById(m_JSContext,jsobj, ida[i], &vpElement))
-					{
-						if (vpElement.isNumber())
-						{
-							double elementValue = vpElement.toNumber();
-							printf("%f \n", elementValue);
-						}
-						if (vpElement.isString())
-						{
-							std::string elementValue = JS_EncodeStringToUTF8(m_JSContext,vpElement.toString());
-							printf("%s \n", elementValue.c_str());
-						}
-						if (vpElement.isObject())
-						{
-							JS::RootedValue vObject(m_JSContext,vpElement);
-							printJSObject(&vObject);
-						}
-					}
-				}else if (element.isInt32())
-				{
-					jsval vpElement;
-					if (JS_GetPropertyById(m_JSContext,jsobj, ida[i], &vpElement))
-					{
-						if (vpElement.isNumber())
-						{
-							double elementValue = vpElement.toNumber();
-							printf("%f \n", elementValue);
-						}
-						if (vpElement.isString())
-						{
-							std::string elementValue = JS_EncodeStringToUTF8(m_JSContext,vpElement.toString());
-							printf("%s \n", elementValue.c_str());
-						}
-					}
-					JS::RootedValue vArray(m_JSContext,vpElement);
-					printJSObject(&vArray);
-				}
-           
-			}
-		}
-	}
+	void printJSObject(JS::MutableHandleValue vp);
 
-	void parseJSON(const std::wstring json)
-	{
-		JS::RootedValue val(m_JSContext);
-		if (JS_ParseJSON(m_JSContext, json.c_str(), json.length(), &val))
-		{
-			printJSObject(&val);
-		}
-	}
+	void parseJSON(const std::wstring json);
 
-	void init()
-	{
-		ac = new JSAutoCompartment(m_JSContext, *m_global);
-		JS_InitStandardClasses(m_JSContext, *m_global);		
-	}
-	bool EvaluateBooleanExpression(std::string expression, std::string ruleName)
-	{
-		int lineno = 0;
-		JS::Value rval;
-		bool ok = JS_EvaluateScript(m_JSContext, *m_global, expression.c_str(), expression.length(), ruleName.c_str(), lineno, &rval);
-		if (ok && !rval.isNull() && rval.isBoolean())
-		{
-			return rval.toBoolean();
-		}
-	}
+	void init();
 
-	jsval evaluateScript(std::string script, std::string name)
-	{
-		int lineno = 0;
-		JS::Value rval;
-		JS_EvaluateScript(m_JSContext, *m_global, script.c_str(), script.length(), name.c_str(), lineno, &rval);
-		return rval;
-	}
+	bool EvaluateBooleanExpression(std::string expression, std::string ruleName);
+
+	jsval evaluateScript(std::string script, std::string name);
 	
-	void defineDoubleValue(std::string name, double defaultValue)
-	{
-		JS_DefineProperty(m_JSContext, *m_global, name.c_str(),JS_NumberValue(defaultValue),NULL,NULL,0);
-	}
+	void defineValue(std::string name, jsval val);
 
-	double getDoubleValue(std::string valueName)
-	{
-		jsval *vp = new jsval();
-		JS_GetProperty(m_JSContext, *m_global, valueName.c_str(), vp);
-		if (vp->isNumber())
-		{
-			return vp->toNumber();
-		}
-	}
+	void defineDoubleValue(std::string name, double defaultValue);
 
-	JSContext * getContext()
-	{
-		return m_JSContext;
-	}
+	void defineObjectFromJSON(std::wstring json);
 
-	~JsRetriever()
-	{
-		delete ac;
-		delete m_global;
-		JS_DestroyContext(m_JSContext);
-	}
+	double getDoubleValue(std::string valueName);
+
+	JSContext * getContext();
+
+	~JsRetriever();
 };

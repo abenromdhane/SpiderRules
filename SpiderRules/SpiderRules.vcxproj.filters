@@ -18,6 +18,15 @@
     <ClCompile Include="main.cpp">
       <Filter>Source Files</Filter>
     </ClCompile>
+    <ClCompile Include="src\RulesSet.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\Rule.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="src\JsRetriever.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\entity.h">
@@ -32,10 +41,10 @@
     <ClInclude Include="headers\utils.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\rule.h">
+    <ClInclude Include="headers\RulesSet.h">
       <Filter>Header Files</Filter>
     </ClInclude>
-    <ClInclude Include="headers\RulesSet.h">
+    <ClInclude Include="headers\Rule.h">
       <Filter>Header Files</Filter>
     </ClInclude>
   </ItemGroup>
